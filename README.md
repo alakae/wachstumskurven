@@ -47,6 +47,23 @@ Ergebnis: `messungen_kurven.pdf`
 | `--mutter-ku`, `--vater-ku` | Kopfumfang der Eltern in cm |
 | `--kalibrierung` | Kalibrierungs-Check, siehe unten |
 
+### Konfiguration
+
+Feste Angaben können in `wachstumskurven.toml` im aktuellen Verzeichnis stehen. Danach genügt `uv run wachstumskurven messungen.csv`. Optionen auf der Kommandozeile haben Vorrang.
+
+```toml
+pdf = "PCH_Wachstumskurven_260701_DE.pdf"
+geschlecht = "m"
+geburtsdatum = 2025-07-22
+name = "Noah Beispiel"
+mutter = 165
+vater = 180
+mutter-ku = 55
+vater-ku = 58
+```
+
+Erlaubt sind `pdf`, `geschlecht`, `geburtsdatum`, `name`, `ssw`, `mutter`, `vater`, `mutter-ku` und `vater-ku`.
+
 ### CSV
 
 ```csv
@@ -67,7 +84,7 @@ datum;laenge;gewicht;kopfumfang
 uv run wachstumskurven --kalibrierung -p PCH_Wachstumskurven_260701_DE.pdf
 ```
 
-Gibt alle Seiten aus und zeichnet das berechnete Gitter darüber. Liegen die roten und orangen Linien auf den gedruckten, stimmt die Kalibrierung.
+Schreibt `kalibrierung.pdf` mit allen Seiten und zeichnet das berechnete Gitter darüber. Ausser `-p` sind keine Optionen erlaubt, `wachstumskurven.toml` wird nicht gelesen. Liegen die roten und orangen Linien auf den gedruckten, stimmt die Kalibrierung.
 
 ## Entwicklung
 

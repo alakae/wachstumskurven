@@ -12,10 +12,12 @@ Auf den Kurven mit dem Hinweis "Bei stehender Messung: 1 cm hinzufügen"
 (Länge 0–2 J., Gewicht für Länge 50–120 cm) werden stehende Werte um 1 cm korrigiert.
 Geburtskurven: Zeile mit datum == Geburtsdatum + --ssw.
 
-Kalibrierungs-Check:  uv run wachstumskurven --kalibrierung --pdf <vorlage.pdf> [-g m|w]
-→ alle Seiten mit nachgezeichnetem Gitter (aus der Kalibrierung berechnet). Liegen die
+Kalibrierungs-Check:  uv run wachstumskurven --kalibrierung --pdf <vorlage.pdf>
+→ kalibrierung.pdf: alle Seiten mit nachgezeichnetem Gitter (aus der Kalibrierung berechnet). Liegen die
   roten/orangen Linien und Beschriftungen exakt auf den gedruckten, stimmt die Kalibrierung.
 Zielgrösse (Tanner): (Mutter + Vater) / 2 ± 6.5 cm, Zielbereich ± 8.5 cm.
+Feste Angaben (pdf, geschlecht, geburtsdatum, name, ssw, mutter, vater, mutter-ku, vater-ku)
+können in ./wachstumskurven.toml stehen; Optionen auf der Kommandozeile haben Vorrang.
 """
 
 import argparse
@@ -23,6 +25,7 @@ import csv
 import hashlib
 import io
 import sys
+import tomllib
 from datetime import date
 from itertools import pairwise
 from pathlib import Path
@@ -34,6 +37,12 @@ from reportlab.pdfgen import canvas
 # SHA-256 der PDF-Version, für die die Kalibrierung unten gilt
 PDF_SHA256 = "5d5d9095bfed168d657aefa101296043f413ef0dae84ebe868811609d22e434a"
 GIRLS_OFFSET = 12  # Mädchen-Seiten liegen 12 Seiten hinter den Jungen-Seiten
+# Konfigurationsdatei im aktuellen Verzeichnis; Schlüssel wie die langen Optionen
+CONFIG_FILE = Path("wachstumskurven.toml")
+CONFIG_KEYS = {
+    "pdf", "geschlecht", "geburtsdatum", "name", "ssw",
+    "mutter", "vater", "mutter-ku", "vater-ku",
+}  # fmt: skip
 
 # Messpunkt: "jahre" immer vorhanden, Messwerte nur wenn nicht leer
 Point = dict[str, float]
@@ -222,6 +231,22 @@ def parse_cm(s: str) -> float:
     return float(s.replace(",", "."))
 
 
+def load_config(path: Path) -> dict[str, object]:
+    """Feste Optionen aus der TOML-Datei lesen, als argparse-Defaults (leer, wenn keine Datei)."""
+    if not path.is_file():
+        return {}
+    try:
+        data = tomllib.loads(path.read_text(encoding="utf-8"))
+    except tomllib.TOMLDecodeError as e:
+        raise SystemExit(f"Fehler in {path}: {e}") from None
+    if unknown := sorted(set(data) - CONFIG_KEYS):
+        raise SystemExit(
+            f"Unbekannte Schlüssel in {path}: {', '.join(unknown)}\n"
+            f"Erlaubt: {', '.join(sorted(CONFIG_KEYS))}"
+        )
+    return {k.replace("-", "_"): v for k, v in data.items()}
+
+
 def parse_ssw(s: str) -> float:
     w, _, d = s.partition("+")
     return float(w) + (float(d) / 7 if d else 0)
@@ -405,7 +430,8 @@ def main() -> None:
     ap.add_argument(
         "--kalibrierung",
         action="store_true",
-        help="alle Seiten mit nachgezeichnetem Gitter ausgeben (ohne CSV)",
+        help="alle Seiten mit nachgezeichnetem Gitter nach kalibrierung.pdf ausgeben"
+        " (nur mit -p, ohne wachstumskurven.toml)",
     )
     ap.add_argument("-n", "--name", default="")
     ap.add_argument(
@@ -419,13 +445,33 @@ def main() -> None:
     ap.add_argument(
         "-p",
         "--pdf",
-        required=True,
         type=Path,
         help="Pfad zur Vorlage PCH_Wachstumskurven_260701_DE.pdf von pädiatrie schweiz",
     )
     a = ap.parse_args()
+    if a.kalibrierung:
+        # nur -p erlaubt, wachstumskurven.toml wird nicht gelesen
+        if extra := [
+            k
+            for k, v in vars(a).items()
+            if k not in ("kalibrierung", "pdf") and v != ap.get_default(k)
+        ]:
+            ap.error(f"--kalibrierung erlaubt nur -p, nicht: {', '.join(extra)}")
+        if a.pdf is None:
+            ap.error("-p/--pdf ist erforderlich")
+    else:
+        # zweiter Durchlauf mit den Werten aus der Datei als Defaults
+        ap.set_defaults(**load_config(CONFIG_FILE))
+        a = ap.parse_args()
+    if a.pdf is None:
+        ap.error(f"-p/--pdf ist erforderlich (oder pdf in {CONFIG_FILE})")
+    if a.geschlecht not in (None, "m", "w"):
+        ap.error(f"geschlecht muss 'm' oder 'w' sein, nicht {a.geschlecht!r}")
     if not a.kalibrierung and not (a.csv and a.geschlecht and a.geburtsdatum):
-        ap.error("csv, -g und -b sind erforderlich (ausser mit --kalibrierung)")
+        ap.error(
+            f"csv, -g und -b sind erforderlich (ausser mit --kalibrierung);"
+            f" -g und -b auch via {CONFIG_FILE}"
+        )
 
     if not a.pdf.is_file():
         ap.error(f"Vorlage nicht gefunden: {a.pdf}")
@@ -441,14 +487,14 @@ def main() -> None:
 
     if a.kalibrierung:
         template, writer = PdfReader(a.pdf), PdfWriter()
-        for sex in [a.geschlecht] if a.geschlecht else ["m", "w"]:
+        for sex in ["m", "w"]:
             for chart in sorted(CHARTS, key=lambda c: CHARTS[c]["page"]):
                 off = GIRLS_OFFSET if sex == "w" else 0
                 page = template.pages[CHARTS[chart]["page"] - 1 + off]
                 size = (float(page.mediabox.width), float(page.mediabox.height))
                 page.merge_page(calibration_page(chart, sex, size))
                 writer.add_page(page)
-        out = Path(a.out or "kalibrierung.pdf")
+        out = Path("kalibrierung.pdf")
         writer.write(out)
         print(f"Kalibrierungs-Check: {len(writer.pages)} Seiten → {out}")
         return
