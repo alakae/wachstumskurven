@@ -1,0 +1,31 @@
+[project]
+name = "wachstumskurven"
+version = "0.1.0"
+description = "Trägt Messwerte aus einer CSV in die offiziellen Wachstumskurven von pädiatrie schweiz ein."
+readme = "README.md"
+authors = [
+    { name = "Alain Kaeslin", email = "ak@alainkaeslin.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "pypdf>=5",
+    "reportlab>=4",
+]
+
+[project.scripts]
+wachstumskurven = "wachstumskurven.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.26,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.mypy]
+strict = true
+files = ["src"]
+
+[dependency-groups]
+dev = [
+    "mypy>=2.4.0",
+    "ruff>=0.17.0",
+    "types-reportlab>=5.0.0.20261008",
+]

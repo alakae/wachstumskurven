@@ -23,10 +23,10 @@ Die Positionen der Kurven sind für genau diese Version kalibriert. Weicht die P
 
 ## Verwendung
 
-Voraussetzung ist [uv](https://docs.astral.sh/uv/). Die Abhängigkeiten stehen im Skript selbst.
+Voraussetzung ist [uv](https://docs.astral.sh/uv/). `uv run` installiert die Abhängigkeiten beim ersten Aufruf automatisch (oder vorab mit `uv sync`).
 
 ```sh
-uv run wachstumskurven.py messungen.csv \
+uv run wachstumskurven messungen.csv \
   -p PCH_Wachstumskurven_260701_DE.pdf \
   -g m -b 2025-07-22 -n "Noah Beispiel"
 ```
@@ -64,7 +64,7 @@ datum;laenge;gewicht;kopfumfang
 ### Kalibrierungs-Check
 
 ```sh
-uv run wachstumskurven.py --kalibrierung -p PCH_Wachstumskurven_260701_DE.pdf
+uv run wachstumskurven --kalibrierung -p PCH_Wachstumskurven_260701_DE.pdf
 ```
 
 Gibt alle Seiten aus und zeichnet das berechnete Gitter darüber. Liegen die roten und orangen Linien auf den gedruckten, stimmt die Kalibrierung.
@@ -72,9 +72,9 @@ Gibt alle Seiten aus und zeichnet das berechnete Gitter darüber. Liegen die rot
 ## Entwicklung
 
 ```sh
-uvx ruff check wachstumskurven.py
-uvx ruff format --check wachstumskurven.py
-uvx --with pypdf --with reportlab --with types-reportlab mypy --strict wachstumskurven.py
+uv run ruff check
+uv run ruff format --check
+uv run mypy
 ```
 
 ## Quellen
