@@ -475,11 +475,22 @@ def main() -> None:
         ap.error(f"-p/--pdf ist erforderlich (oder pdf in {CONFIG_FILE})")
     if a.geschlecht not in (None, "m", "w"):
         ap.error(f"geschlecht muss 'm' oder 'w' sein, nicht {a.geschlecht!r}")
-    if not a.kalibrierung and not (a.csv and a.geschlecht and a.geburtsdatum):
-        ap.error(
-            f"csv, -g und -b sind erforderlich (ausser mit --kalibrierung);"
-            f" -g und -b auch via {CONFIG_FILE}"
-        )
+    if not a.kalibrierung:
+        # nur nennen, was wirklich fehlt
+        missing = [
+            text
+            for text, value in (
+                ("CSV-Datei mit Messwerten, z.B. wachstumskurven messungen.csv", a.csv),
+                (f"-g/--geschlecht (oder geschlecht in {CONFIG_FILE})", a.geschlecht),
+                (
+                    f"-b/--geburtsdatum (oder geburtsdatum in {CONFIG_FILE})",
+                    a.geburtsdatum,
+                ),
+            )
+            if not value
+        ]
+        if missing:
+            ap.error("es fehlt: " + "; ".join(missing))
 
     if not a.pdf.is_file():
         ap.error(f"Vorlage nicht gefunden: {a.pdf}")
