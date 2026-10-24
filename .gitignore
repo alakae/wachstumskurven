@@ -10,4 +10,8 @@ wheels/
 .venv
 
 # Persönliche Angaben
-wachstumskurven.toml
+/wachstumskurven.toml
+
+# Vorlage (nicht weiterverteilen) und erzeugte Kurven
+examples/PCH_Wachstumskurven_*.pdf
+*_kurven.pdf

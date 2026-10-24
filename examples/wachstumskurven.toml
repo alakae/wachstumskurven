@@ -1,0 +1,9 @@
+pdf = "PCH_Wachstumskurven_260701_DE.pdf"
+geschlecht = "m"
+geburtsdatum = 2025-08-12
+name = "Noah Beispiel"
+ssw = "39+4"
+mutter = 165
+vater = 180
+mutter-ku = 55
+vater-ku = 58

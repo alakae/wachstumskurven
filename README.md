@@ -78,6 +78,15 @@ datum;laenge;gewicht;kopfumfang
 - Länge mit Suffix `L` (liegend) oder `S` (stehend). Ohne Suffix gilt liegend. Wo die Vorlage es verlangt, werden stehende Werte um 1 cm korrigiert.
 - Für die Kurven bei Geburt braucht es eine Zeile mit dem Geburtsdatum und `--ssw`.
 
+### Beispiel
+
+In `examples/` liegen synthetische Messwerte eines Jungen (geboren 2025-08-12, SSW 39+4) bis zum Alter von 14 Monaten, samt passender `wachstumskurven.toml`. Die Vorlage zuerst nach `examples/` legen:
+
+```sh
+cd examples
+uv run wachstumskurven sample.csv
+```
+
 ### Kalibrierungs-Check
 
 ```sh
