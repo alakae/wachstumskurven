@@ -3,7 +3,8 @@
 Die Vorlage wird nicht mitgeliefert und nicht heruntergeladen. Bitte selbst bei
 pädiatrie schweiz beziehen (PCH_Wachstumskurven_260701_DE.pdf) und mit --pdf angeben.
 
-CSV-Spalten: datum, laenge, gewicht, kopfumfang  (leere Zellen erlaubt; ',' oder ';' als Trenner)
+CSV-Spalten: datum, laenge, gewicht, kopfumfang  (leere Zellen erlaubt; ',' oder ';' als Trenner;
+             Zeilen mit gleichem Datum werden zusammengeführt)
 Beispiel:    uv run wachstumskurven messungen.csv --pdf PCH_Wachstumskurven_260701_DE.pdf -g w -b 2024-03-15 --ssw 39+3 --mutter 165 --vater 180 \
              --mutter-ku 55 --vater-ku 58
 
@@ -171,25 +172,32 @@ def read_csv(path: str, born: date) -> list[Point]:
     rows = csv.DictReader(
         io.StringIO(text), delimiter=";" if text.count(";") > text.count(",") else ","
     )
-    out: list[Point] = []
+    # Zeilen mit gleichem Datum zusammenführen (z.B. Länge und Gewicht auf eigenen Zeilen)
+    merged: dict[date, Point] = {}
     for row in rows:
         r = {k.strip().lower(): v for k, v in row.items() if k}
         d = parse_date(r.get("datum") or "")
-        p: Point = {"jahre": (d - born).days / 365.25}
+        q: Point = {}
         laenge = (r.get("laenge") or "").strip().upper()
         if laenge.endswith(("L", "S")):
             if laenge.endswith("S"):
-                p["stehend"] = 1.0
+                q["stehend"] = 1.0
             laenge = laenge[:-1]
         if v := num(laenge):
-            p["laenge"] = v
+            q["laenge"] = v
+        else:
+            q.pop("stehend", None)
         for k in ("gewicht", "kopfumfang"):
             if v := num(r.get(k)):
-                p[k] = v
+                q[k] = v
+        p = merged.setdefault(d, {"jahre": (d - born).days / 365.25})
+        if "laenge" in q:
+            p.pop("stehend", None)  # Suffix gehört zur Länge aus derselben Zeile
+        p.update(q)
+    for p in merged.values():
         if "laenge" in p and "gewicht" in p:
             p["bmi"] = p["gewicht"] / (p["laenge"] / 100) ** 2
-        out.append(p)
-    return sorted(out, key=lambda p: p["jahre"])
+    return sorted(merged.values(), key=lambda p: p["jahre"])
 
 
 def velocities(points: list[Point]) -> list[Point]:

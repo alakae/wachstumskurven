@@ -74,7 +74,7 @@ datum;laenge;gewicht;kopfumfang
 ```
 
 - Trenner `;` oder `,`, Dezimalkomma erlaubt.
-- Leere Zellen sind erlaubt, nur `datum` ist Pflicht. Die Reihenfolge der Zeilen ist egal.
+- Leere Zellen sind erlaubt, nur `datum` ist Pflicht. Die Reihenfolge der Zeilen ist egal. Zeilen mit gleichem Datum werden zusammengeführt, Länge und Gewicht dürfen also auf eigenen Zeilen stehen.
 - Länge mit Suffix `L` (liegend) oder `S` (stehend). Ohne Suffix gilt liegend. Wo die Vorlage es verlangt, werden stehende Werte um 1 cm korrigiert.
 - Für die Kurven bei Geburt braucht es eine Zeile mit dem Geburtsdatum und `--ssw`.
 
