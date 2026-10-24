@@ -17,7 +17,7 @@ Das Projekt steht in keiner Verbindung zu pädiatrie schweiz.
 
 ## Vorlage
 
-Die Vorlage wird nicht mitgeliefert. Lade `PCH_Wachstumskurven_260701_DE.pdf` selbst bei [pädiatrie schweiz](https://www.paediatrieschweiz.ch) herunter.
+Die Vorlage wird nicht mitgeliefert. Lade `PCH_Wachstumskurven_260701_DE.pdf` selbst bei [pädiatrie schweiz](https://www.paediatrieschweiz.ch/unterlagen/wachstumskurven/) herunter.
 
 Die Positionen der Kurven sind für genau diese Version kalibriert. Weicht die Prüfsumme der Vorlage ab, gibt das Skript eine Warnung aus.
 
