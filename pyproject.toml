@@ -19,6 +19,9 @@ wachstumskurven = "wachstumskurven.cli:main"
 requires = ["uv_build>=0.9.26,<0.10.0"]
 build-backend = "uv_build"
 
+[tool.uv]
+exclude-newer = "7 days"
+
 [tool.mypy]
 strict = true
 files = ["src"]
