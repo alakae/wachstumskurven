@@ -1,5 +1,7 @@
 # Wachstumskurven
 
+*Plots a child's measurements from a CSV file onto the official Swiss growth charts by pädiatrie schweiz. Documentation in German.*
+
 Trägt Messwerte aus einer CSV in die offiziellen Wachstumskurven von pädiatrie schweiz ein.
 
 ## Disclaimer
