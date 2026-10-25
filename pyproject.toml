@@ -12,6 +12,9 @@ dependencies = [
     "reportlab>=4",
 ]
 
+[project.urls]
+Repository = "https://github.com/alakae/wachstumskurven"
+
 [project.scripts]
 wachstumskurven = "wachstumskurven.cli:main"
 
