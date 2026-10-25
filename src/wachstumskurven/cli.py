@@ -5,7 +5,7 @@ pädiatrie schweiz beziehen (PCH_Wachstumskurven_260701_DE.pdf) und mit --pdf an
 
 CSV-Spalten: datum, laenge, gewicht, kopfumfang  (leere Zellen erlaubt; ',' oder ';' als Trenner;
              Zeilen mit gleichem Datum werden zusammengeführt)
-Beispiel:    uv run wachstumskurven messungen.csv --pdf PCH_Wachstumskurven_260701_DE.pdf -g w -b 2024-03-15 --ssw 39+3 --mutter 165 --vater 180 \
+Beispiel:    wachstumskurven messungen.csv --pdf PCH_Wachstumskurven_260701_DE.pdf -g w -b 2024-03-15 --ssw 39+3 --mutter 165 --vater 180 \
              --mutter-ku 55 --vater-ku 58
 
 Länge mit Suffix L (liegend) oder S (stehend), z.B. 76,5L oder 102S; ohne Suffix = liegend.
@@ -13,7 +13,7 @@ Auf den Kurven mit dem Hinweis "Bei stehender Messung: 1 cm hinzufügen"
 (Länge 0–2 J., Gewicht für Länge 50–120 cm) werden stehende Werte um 1 cm korrigiert.
 Geburtskurven: Zeile mit datum == Geburtsdatum + --ssw.
 
-Kalibrierungs-Check:  uv run wachstumskurven --kalibrierung --pdf <vorlage.pdf>
+Kalibrierungs-Check:  wachstumskurven --kalibrierung --pdf <vorlage.pdf>
 → kalibrierung.pdf: alle Seiten mit nachgezeichnetem Gitter (aus der Kalibrierung berechnet). Liegen die
   roten/orangen Linien und Beschriftungen exakt auf den gedruckten, stimmt die Kalibrierung.
 Zielgrösse (Tanner): (Mutter + Vater) / 2 ± 6.5 cm, Zielbereich ± 8.5 cm.

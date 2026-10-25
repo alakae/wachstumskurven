@@ -21,12 +21,31 @@ Die Vorlage wird nicht mitgeliefert. Lade `PCH_Wachstumskurven_260701_DE.pdf` se
 
 Die Positionen der Kurven sind für genau diese Version kalibriert. Weicht die Prüfsumme der Vorlage ab, gibt das Skript eine Warnung aus.
 
-## Verwendung
+## Installation
 
-Voraussetzung ist [uv](https://docs.astral.sh/uv/). `uv run` installiert die Abhängigkeiten beim ersten Aufruf automatisch (oder vorab mit `uv sync`).
+Voraussetzung ist [uv](https://docs.astral.sh/uv/). Installation direkt aus GitHub:
 
 ```sh
-uv run wachstumskurven messungen.csv \
+uv tool install git+https://github.com/alakae/wachstumskurven
+```
+
+Auf den neuesten Stand bringen:
+
+```sh
+uv tool upgrade wachstumskurven
+```
+
+Tipp: Mit `--exclude-newer "7 days"` werden nur Abhängigkeiten verwendet, die seit mindestens sieben Tagen veröffentlicht sind. Das schützt vor frisch kompromittierten Paketversionen. uv merkt sich dabei ein festes Datum, nicht "7 days". Die Option deshalb auch bei jedem Update angeben, sonst bleiben die Abhängigkeiten auf dem Stand der Installation:
+
+```sh
+uv tool install --exclude-newer "7 days" git+https://github.com/alakae/wachstumskurven
+uv tool upgrade --exclude-newer "7 days" wachstumskurven
+```
+
+## Verwendung
+
+```sh
+wachstumskurven messungen.csv \
   -p PCH_Wachstumskurven_260701_DE.pdf \
   -g m -b 2025-07-22 -n "Noah Beispiel"
 ```
@@ -49,7 +68,7 @@ Ergebnis: `messungen_kurven.pdf`
 
 ### Konfiguration
 
-Feste Angaben können in `wachstumskurven.toml` im aktuellen Verzeichnis stehen. Danach genügt `uv run wachstumskurven messungen.csv`. Optionen auf der Kommandozeile haben Vorrang.
+Feste Angaben können in `wachstumskurven.toml` im aktuellen Verzeichnis stehen. Danach genügt `wachstumskurven messungen.csv`. Optionen auf der Kommandozeile haben Vorrang.
 
 ```toml
 pdf = "PCH_Wachstumskurven_260701_DE.pdf"
@@ -80,24 +99,26 @@ datum;laenge;gewicht;kopfumfang
 
 ### Beispiel
 
-In `examples/` liegen synthetische Messwerte eines Jungen (geboren 2025-08-12, SSW 39+4) bis zum Alter von 14 Monaten, samt passender `wachstumskurven.toml`. Die Vorlage zuerst nach `examples/` legen:
+In [`examples/`](examples/) liegen synthetische Messwerte eines Jungen (geboren 2025-08-12, SSW 39+4) bis zum Alter von 14 Monaten, samt passender `wachstumskurven.toml`. Beide Dateien und die Vorlage in ein Verzeichnis legen, dann dort:
 
 ```sh
-cd examples
-uv run wachstumskurven sample.csv
+wachstumskurven sample.csv
 ```
 
 ### Kalibrierungs-Check
 
 ```sh
-uv run wachstumskurven --kalibrierung -p PCH_Wachstumskurven_260701_DE.pdf
+wachstumskurven --kalibrierung -p PCH_Wachstumskurven_260701_DE.pdf
 ```
 
 Schreibt `kalibrierung.pdf` mit allen Seiten und zeichnet das berechnete Gitter darüber. Ausser `-p` sind keine Optionen erlaubt, `wachstumskurven.toml` wird nicht gelesen. Liegen die roten und orangen Linien auf den gedruckten, stimmt die Kalibrierung.
 
 ## Entwicklung
 
+Im geklonten Repository läuft das Tool mit `uv run`, mit genau den Versionen aus `uv.lock`:
+
 ```sh
+uv run wachstumskurven messungen.csv
 uv run ruff check
 uv run ruff format --check
 uv run mypy
