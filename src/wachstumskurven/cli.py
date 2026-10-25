@@ -162,9 +162,12 @@ def parse_date(s: str) -> date:
         raise argparse.ArgumentTypeError(msg) from None
 
 
-def num(s: str | None) -> float | None:
-    s = (s or "").strip().replace(",", ".")
-    return float(s) if s else None
+def num(s: str | None, name: str) -> float | None:
+    s = (s or "").strip()
+    try:
+        return float(s.replace(",", ".")) if s else None
+    except ValueError:
+        raise ValueError(f"{name} {s!r} ist keine Zahl") from None
 
 
 def read_csv(path: str, born: date) -> list[Point]:
@@ -176,20 +179,23 @@ def read_csv(path: str, born: date) -> list[Point]:
     merged: dict[date, Point] = {}
     for row in rows:
         r = {k.strip().lower(): v for k, v in row.items() if k}
-        d = parse_date(r.get("datum") or "")
         q: Point = {}
-        laenge = (r.get("laenge") or "").strip().upper()
-        if laenge.endswith(("L", "S")):
-            if laenge.endswith("S"):
-                q["stehend"] = 1.0
-            laenge = laenge[:-1]
-        if v := num(laenge):
-            q["laenge"] = v
-        else:
-            q.pop("stehend", None)
-        for k in ("gewicht", "kopfumfang"):
-            if v := num(r.get(k)):
-                q[k] = v
+        try:
+            d = parse_date(r.get("datum") or "")
+            laenge = (r.get("laenge") or "").strip()
+            if laenge[-1:].upper() in ("L", "S"):
+                if laenge[-1:].upper() == "S":
+                    q["stehend"] = 1.0
+                laenge = laenge[:-1]
+            if v := num(laenge, "Länge"):
+                q["laenge"] = v
+            else:
+                q.pop("stehend", None)
+            for k, name in (("gewicht", "Gewicht"), ("kopfumfang", "Kopfumfang")):
+                if v := num(r.get(k), name):
+                    q[k] = v
+        except (ValueError, argparse.ArgumentTypeError) as e:
+            raise SystemExit(f"{path}, Zeile {rows.line_num}: {e}") from None
         p = merged.setdefault(d, {"jahre": (d - born).days / 365.25})
         if "laenge" in q:
             p.pop("stehend", None)  # Suffix gehört zur Länge aus derselben Zeile
