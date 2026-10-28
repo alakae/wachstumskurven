@@ -8,7 +8,7 @@ Trägt Messwerte aus einer CSV in die offiziellen Wachstumskurven von pädiatrie
 
 Ein Just-for-fun-Projekt von einem Vater für Eltern, die das Wachstum ihres Kindes mitverfolgen möchten. Es ist kein Medizinprodukt und ersetzt keine ärztliche Beurteilung. Die Diagramme können Fehler enthalten. Bei Fragen oder Sorgen zur Entwicklung eures Kindes: Kinderärztin oder Kinderarzt fragen.
 
-Das Projekt steht in keiner Verbindung zu pädiatrie schweiz.
+**Dieses Projekt ist ein unabhängiges, privates Projekt und steht in keinerlei Verbindung zu pädiatrie schweiz. Es wird von pädiatrie schweiz weder betrieben, beauftragt, geprüft, unterstützt noch empfohlen.** Die Nennung von «pädiatrie schweiz» dient ausschliesslich der Angabe der Quelle der Vorlage. Sämtliche Rechte an den Wachstumskurven und an der Vorlage liegen bei den jeweiligen Rechteinhabern.
 
 ## Überblick
 
