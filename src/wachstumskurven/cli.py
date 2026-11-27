@@ -515,10 +515,9 @@ def main() -> None:
         for sex in ["m", "w"]:
             for chart in sorted(CHARTS, key=lambda c: CHARTS[c]["page"]):
                 off = GIRLS_OFFSET if sex == "w" else 0
-                page = template.pages[CHARTS[chart]["page"] - 1 + off]
+                page = writer.add_page(template.pages[CHARTS[chart]["page"] - 1 + off])
                 size = (float(page.mediabox.width), float(page.mediabox.height))
                 page.merge_page(calibration_page(chart, sex, size))
-                writer.add_page(page)
         out = Path("kalibrierung.pdf")
         writer.write(out)
         print(f"Kalibrierungs-Check: {len(writer.pages)} Seiten → {out}")
@@ -548,7 +547,7 @@ def main() -> None:
     template, writer = PdfReader(a.pdf), PdfWriter()
     offset = GIRLS_OFFSET if a.geschlecht == "w" else 0
     for chart in charts:
-        page = template.pages[CHARTS[chart]["page"] - 1 + offset]
+        page = writer.add_page(template.pages[CHARTS[chart]["page"] - 1 + offset])
         size = (float(page.mediabox.width), float(page.mediabox.height))
         data = vel if chart == "vel" else points
         if chart in STANDING_CHARTS:
@@ -567,7 +566,6 @@ def main() -> None:
                 zg,
             )
         )
-        writer.add_page(page)
 
     out = Path(a.out or Path(a.csv).with_suffix("").as_posix() + "_kurven.pdf")
     writer.write(out)
